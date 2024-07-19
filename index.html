@@ -5,13 +5,16 @@
     <title>Calculadora de Rentabilidad</title>
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 20px;
         max-width: 600px;
         margin: auto;
         padding: 20px;
         border: 1px solid #ccc;
         border-radius: 10px;
+        background-color: #e0e0e0;
+        color: #333;
+        transition: background-color 0.3s, color 0.3s;
       }
       input[type="number"],
       input[type="button"] {
@@ -20,10 +23,12 @@
         margin: 10px 0;
         border: 1px solid #ccc;
         border-radius: 5px;
+        background-color: #f0f0f0;
+        transition: background-color 0.3s;
       }
       input[type="button"] {
         cursor: pointer;
-        background-color: #28a745;
+        background-color: #1e90ff;
         color: white;
         border: none;
       }
@@ -34,10 +39,68 @@
         border-radius: 5px;
         background-color: #f9f9f9;
       }
+      .futuristic {
+        font-family: 'Orbitron', sans-serif;
+      }
+      .dark-mode {
+        background-color: #121212;
+        color: #e0e0e0;
+      }
+      .dark-mode input[type="number"],
+      .dark-mode input[type="button"] {
+        background-color: #333;
+        color: #e0e0e0;
+        border: 1px solid #555;
+      }
+      .dark-mode input[type="button"] {
+        background-color: #ff6347;
+      }
+      .dark-mode .result {
+        background-color: #1e1e1e;
+        border: 1px solid #555;
+      }
+      .theme-button, .language-button {
+        padding: 10px 20px;
+        margin: 10px 5px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 14px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      .theme-button {
+        background-color: #4CAF50;
+        color: white;
+      }
+      .theme-button:hover {
+        background-color: #45a049;
+      }
+      .language-button {
+        background-color: #008CBA;
+        color: white;
+      }
+      .language-button:hover {
+        background-color: #007bb5;
+      }
+      .dark-mode .theme-button {
+        background-color: #f39c12;
+        color: white;
+      }
+      .dark-mode .theme-button:hover {
+        background-color: #e67e22;
+      }
+      .dark-mode .language-button {
+        background-color: #3498db;
+        color: white;
+      }
+      .dark-mode .language-button:hover {
+        background-color: #2980b9;
+      }
     </style>
   </head>
   <body>
-    <h1>Calculadora de Rentabilidad</h1>
+    <h1 class="futuristic">Calculadora de Rentabilidad</h1>
     <form id="calculator">
       <h2>Datos de Inversión</h2>
       <label for="initialInvestment">Inversión Inicial (en $):</label>
@@ -63,6 +126,11 @@
       <p id="irr"></p>
     </div>
 
+    <div>
+      <button class="theme-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+      <button class="language-button" onclick="toggleLanguage()">Change Language</button>
+    </div>
+
     <script>
       function calculate() {
         const initialInvestment = parseFloat(
@@ -77,13 +145,8 @@
         const discountRate =
           parseFloat(document.getElementById("discountRate").value) / 100;
 
-        // Rentabilidad Total
         const totalReturn = cashFlows * years - initialInvestment;
-
-        // Rentabilidad del Flujo Medio
         const averageReturn = totalReturn / years;
-
-        // Payback Period
         let cumulativeCashFlow = -initialInvestment;
         let paybackPeriod = 0;
         for (let i = 1; i <= years; i++) {
@@ -93,19 +156,13 @@
             break;
           }
         }
-
-        // Rentabilidad considerando la Inflación
         const realRate = (1 + discountRate) / (1 + inflationRate) - 1;
         const realCashFlows = cashFlows / Math.pow(1 + inflationRate, years);
         const realTotalReturn = realCashFlows * years - initialInvestment;
-
-        // Valor Presente Neto (VPN)
         let npv = -initialInvestment;
         for (let i = 1; i <= years; i++) {
           npv += cashFlows / Math.pow(1 + discountRate, i);
         }
-
-        // Tasa Interna de Retorno (TIR)
         const irr =
           cashFlows / Math.pow(1 + discountRate, years) - initialInvestment;
 
@@ -133,6 +190,60 @@
         ).textContent = `Tasa Interna de Retorno (TIR): ${irr.toFixed(2)}%`;
 
         document.getElementById("results").style.display = "block";
+      }
+
+      function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+      }
+
+      let isEnglish = false;
+
+      function toggleLanguage() {
+        const elements = document.querySelectorAll('h1, h2, label, input[type="button"], .result p');
+        const translations = {
+          es: {
+            'Calculadora de Rentabilidad': 'Profitability Calculator',
+            'Datos de Inversión': 'Investment Data',
+            'Inversión Inicial (en $):': 'Initial Investment (in $):',
+            'Flujos de Efectivo Anuales (en $):': 'Annual Cash Flows (in $):',
+            'Número de Años:': 'Number of Years:',
+            'Tasa de Inflación (% anual):': 'Inflation Rate (% per year):',
+            'Tasa de Descuento (% anual):': 'Discount Rate (% per year):',
+            'Calcular': 'Calculate',
+            'Resultados': 'Results',
+            'Rentabilidad Total:': 'Total Profitability:',
+            'Rentabilidad del Flujo Medio:': 'Average Return:',
+            'Payback Period:': 'Payback Period:',
+            'Rentabilidad Ajustada por Inflación:': 'Inflation Adjusted Return:',
+            'Valor Presente Neto (VPN):': 'Net Present Value (NPV):',
+            'Tasa Interna de Retorno (TIR):': 'Internal Rate of Return (IRR):'
+          },
+          en: {
+            'Profitability Calculator': 'Calculadora de Rentabilidad',
+            'Investment Data': 'Datos de Inversión',
+            'Initial Investment (in $):': 'Inversión Inicial (en $):',
+            'Annual Cash Flows (in $):': 'Flujos de Efectivo Anuales (en $):',
+            'Number of Years:': 'Número de Años:',
+            'Inflation Rate (% per year):': 'Tasa de Inflación (% anual):',
+            'Discount Rate (% per year):': 'Tasa de Descuento (% anual):',
+            'Calculate': 'Calcular',
+            'Results': 'Resultados',
+            'Total Profitability:': 'Rentabilidad Total:',
+            'Average Return:': 'Rentabilidad del Flujo Medio:',
+            'Payback Period:': 'Payback Period:',
+            'Inflation Adjusted Return:': 'Rentabilidad Ajustada por Inflación:',
+            'Net Present Value (NPV):': 'Valor Presente Neto (VPN):',
+            'Internal Rate of Return (IRR):': 'Tasa Interna de Retorno (TIR):'
+          }
+        };
+
+        elements.forEach(el => {
+          if (translations[isEnglish ? 'en' : 'es'][el.textContent.trim()]) {
+            el.textContent = translations[isEnglish ? 'en' : 'es'][el.textContent.trim()];
+          }
+        });
+
+        isEnglish = !isEnglish;
       }
     </script>
   </body>
