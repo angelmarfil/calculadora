@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Calculadora de Rentabilidad</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+      }
+      input[type="number"],
+      input[type="button"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      input[type="button"] {
+        cursor: pointer;
+        background-color: #28a745;
+        color: white;
+        border: none;
+      }
+      .result {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Calculadora de Rentabilidad</h1>
+    <form id="calculator">
+      <h2>Datos de Inversión</h2>
+      <label for="initialInvestment">Inversión Inicial (en $):</label>
+      <input type="number" id="initialInvestment" required />
+      <label for="cashFlows">Flujos de Efectivo Anuales (en $):</label>
+      <input type="number" id="cashFlows" required />
+      <label for="years">Número de Años:</label>
+      <input type="number" id="years" required />
+      <label for="inflationRate">Tasa de Inflación (% anual):</label>
+      <input type="number" id="inflationRate" step="0.01" required />
+      <label for="discountRate">Tasa de Descuento (% anual):</label>
+      <input type="number" id="discountRate" step="0.01" required />
+      <input type="button" value="Calcular" onclick="calculate()" />
+    </form>
+
+    <div class="result" id="results" style="display: none">
+      <h2>Resultados</h2>
+      <p id="totalReturn"></p>
+      <p id="averageReturn"></p>
+      <p id="paybackPeriod"></p>
+      <p id="realReturn"></p>
+      <p id="npv"></p>
+      <p id="irr"></p>
+    </div>
+
+    <script>
+      function calculate() {
+        const initialInvestment = parseFloat(
+          document.getElementById("initialInvestment").value
+        );
+        const cashFlows = parseFloat(
+          document.getElementById("cashFlows").value
+        );
+        const years = parseInt(document.getElementById("years").value);
+        const inflationRate =
+          parseFloat(document.getElementById("inflationRate").value) / 100;
+        const discountRate =
+          parseFloat(document.getElementById("discountRate").value) / 100;
+
+        // Rentabilidad Total
+        const totalReturn = cashFlows * years - initialInvestment;
+
+        // Rentabilidad del Flujo Medio
+        const averageReturn = totalReturn / years;
+
+        // Payback Period
+        let cumulativeCashFlow = -initialInvestment;
+        let paybackPeriod = 0;
+        for (let i = 1; i <= years; i++) {
+          cumulativeCashFlow += cashFlows;
+          if (cumulativeCashFlow >= 0) {
+            paybackPeriod = i;
+            break;
+          }
+        }
+
+        // Rentabilidad considerando la Inflación
+        const realRate = (1 + discountRate) / (1 + inflationRate) - 1;
+        const realCashFlows = cashFlows / Math.pow(1 + inflationRate, years);
+        const realTotalReturn = realCashFlows * years - initialInvestment;
+
+        // Valor Presente Neto (VPN)
+        let npv = -initialInvestment;
+        for (let i = 1; i <= years; i++) {
+          npv += cashFlows / Math.pow(1 + discountRate, i);
+        }
+
+        // Tasa Interna de Retorno (TIR)
+        const irr =
+          cashFlows / Math.pow(1 + discountRate, years) - initialInvestment;
+
+        document.getElementById(
+          "totalReturn"
+        ).textContent = `Rentabilidad Total: $${totalReturn.toFixed(2)}`;
+        document.getElementById(
+          "averageReturn"
+        ).textContent = `Rentabilidad del Flujo Medio: $${averageReturn.toFixed(
+          2
+        )}`;
+        document.getElementById(
+          "paybackPeriod"
+        ).textContent = `Payback Period: ${paybackPeriod} años`;
+        document.getElementById(
+          "realReturn"
+        ).textContent = `Rentabilidad Ajustada por Inflación: $${realTotalReturn.toFixed(
+          2
+        )}`;
+        document.getElementById(
+          "npv"
+        ).textContent = `Valor Presente Neto (VPN): $${npv.toFixed(2)}`;
+        document.getElementById(
+          "irr"
+        ).textContent = `Tasa Interna de Retorno (TIR): ${irr.toFixed(2)}%`;
+
+        document.getElementById("results").style.display = "block";
+      }
+    </script>
+  </body>
+</html>
